@@ -8,22 +8,44 @@ date: "2023-02-22"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+```{r}
+library(dplyr)
+library(lubridate)
+df1 = read.csv("../../data/washington_weather.csv")
+df2 = read.csv("../../data/washingtondc.csv")
+date_obj <- as.Date(as.character(df1$Date), "%Y%m%d")  # Convert to Date object
+df1$Date <- format(date_obj, "%Y-%m-%d")  # Convert to desired format
+df1 <- df1 %>%
+  filter(month(Date) %in% 1:4)
+df2 <- df2 %>%
+  filter(year >= 1945)
+df2 <- df2 %>%
+  rename("Date" = "bloom_date")
+df1 <- df1 %>% left_join( df2, 
+           by=c("Date"))
+df1$Date <- as.Date(df1$Date, "%Y-%m-%d")
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+library(tidyr)
+df1 <- df1 %>%
+  mutate(year = format(Date, "%Y")) %>%  # Create a new column for the year
+  filter(year != 1946) %>%
+  group_by(year) %>%
+  mutate(bloom_doy = ifelse(is.na(bloom_doy), NA, 1)) %>%
+  fill(bloom_doy, .direction = "down") %>%
+  mutate(bloom_doy = if_else(is.na(bloom_doy), 0, bloom_doy))%>%
+  rename("WhetherBloom" = "bloom_doy") %>%
+  ungroup() %>%
+  dplyr::select(-(location:year)) 
+df1 = data.frame(df1, Year = substring(df1$Date, 1, 4))
+year = unique(df1$Year)
+index = c()
+for (i in year){
+  temp = length(df1$Year[df1$Year == i])
+  index = append(index,c(1:temp))
+}
+length(index)
+length(df1$Year)
+df1 = data.frame(df1, dayInYear = index)
+df1
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
