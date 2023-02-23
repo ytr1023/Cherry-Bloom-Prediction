@@ -113,7 +113,15 @@ for (i in 1:length(predictdataInFrame)){
 
 a = yearAndBloomDate$Day
 b = predictYearAndBloomDate$Day
-sum(abs(a-b)) / length(predictdataInFrame)
+averageOffDays = sum(abs(a-b)) / length(predictdataInFrame)
+accurateNum = 0
+diff = abs(a-b)
+for (i in 1:length(predictdataInFrame)){
+  if((diff[i] - 4) <= 0){
+    accurateNum = accurateNum + 1
+  }
+}
+accuracy = accurateNum / length(predictdataInFrame); accuracy
 
 ```
 
