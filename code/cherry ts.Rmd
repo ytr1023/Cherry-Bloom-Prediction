@@ -1,0 +1,253 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(readr)
+library(tseries)
+library(forecast)
+clean=read.csv("clean_data.csv")
+clean=na.omit(clean)
+clean
+```
+#raw data plot
+```{r}
+df1 <- clean[8800:9145,]
+df1
+```
+
+```{r}
+ts.clean=ts(clean)
+plot(ts.clean)
+```
+#抽一下变量
+```{r}
+avgtemp <- clean[c("Temp")]
+ts.avgtemp=ts(avgtemp)
+acf(ts.avgtemp,lag.max = 30)
+```
+```{r}
+pacf(ts.avgtemp,lag.max=30)
+```
+```{r}
+ar.mod = auto.arima(ts.avgtemp,ic="aic",allowmean=FALSE)
+ar.mod
+```
+
+```{r}
+Box.test(ar.mod$residuals, lag=20, type="Ljung-Box")
+```
+```{r}
+h=300
+
+Yt.forcast = predict(ar.mod,h)
+Yt.forcast$pred
+```
+```{r}
+time = (1:300)
+bond = 1.96*Yt.forcast$se
+
+lower = Yt.forcast$pred - bond
+upper = Yt.forcast$pred + bond
+lower
+upper
+
+plot(ts.avgtemp, xlim=c(0,200))
+
+lines(time,lower,lty=2,lwd=2,col="red")
+lines(time,upper,lty=2,lwd=2,col="blue")
+```
+#只用开花
+```{r}
+bloom <- clean[c("bloom_doy")]
+ts.bloom=ts(bloom)
+acf(ts.bloom,lag.max = 30)
+pacf(ts.bloom,lag.max=1000)
+```
+```{r}
+ar.mod1 = auto.arima(ts.bloom,ic="aic",allowmean=FALSE)
+ar.mod1
+```
+```{r}
+ar.mod2 = auto.arima(ts.bloom,ic="bic",allowmean=FALSE)
+ar.mod2
+```
+#simple exponential smoothing
+```{r}
+fc1 <- ses(ts.bloom, h=4,level=0.95)
+fc1$model
+```
+这个alpha大的有点离谱
+#用一下holt method
+```{r}
+fc2 = holt(ts.bloom, damped=TRUE, h =300 ,level = 0.99)
+autoplot(fc2)
+```
+#距离开花时间
+```{r}
+day=read.csv("washingtondc.csv")
+day
+```
+
+```{r}
+bloom.day=day[c("bloom_doy")]
+bloom.day
+```
+
+```{r}
+ts.bloom.day=ts(bloom.day)
+plot(ts.bloom.day)
+acf(ts.bloom.day,lag.max = 30)
+pacf(ts.bloom.day,lag.max=1000)
+```
+```{r}
+ar.modb = auto.arima(ts.bloom.day,max.q=0, ic="aic",allowmean=FALSE)
+ar.modb
+```
+
+```{r}
+ar.modb1 = auto.arima(ts.bloom.day,max.p=0, ic="bic",allowmean=FALSE)
+ar.modb1
+plot(forecast(ar.modb1, h=10, level=0.9))
+```
+
+```{r}
+fc3 = holt(ts.bloom.day, damped=TRUE, h =10,level = 0.9)
+autoplot(fc3)
+```
+```{r}
+fc4 <- ses(ts.bloom.day, h=30,level=0.95)
+fc4$model
+```
+
+```{r}
+library(ggplot2)
+autoplot(fc4) +
+autolayer(fitted(fc4), series="Fitted") + ylab("hardcover books)") + xlab("time")
+```
+
+```{r}
+resid.qd = resid(ar.modb)
+plot(resid.qd,ylab="Residuals",xlab="Time")
+
+```
+```{r}
+acf(resid.qd, lag.max=20,ylim=c(-1,1))
+pacf(resid.qd,lag.max=20,ylim=c(-1,1))
+```
+```{r}
+fc6 = holt(resid.qd, damped=TRUE, h =10,level = 0.9)
+autoplot(fc6)
+```
+```{r}
+resid.qc = resid(ar.modb1)
+plot(resid.qc,ylab="Residuals",xlab="Time")
+
+```
+#试一下LSTM
+先分一下训练集和测试集
+```{r}
+#install.packages("tensorflow")
+library(keras)
+library(tensorflow)
+library(reticulate)
+library(kerasR)
+
+clean <- clean[c("Average.Temperature","Total.Precipitation","Humidity..rh.","WhetherBloom")]
+#train_size <- as.integer(length(clean$Average.Temperature) - 500) #此问题的16650表示用最后15天数据作为test集 
+#atrain <- clean$Average.Temperature[1:train_size]
+#atest <- clean$Average.Temperature[(train_size + 1):length(clean$Average.Temperature)]
+#cat(length(atrain), length(atest))
+```
+#数据标准化
+
+
+#VAR
+```{r}
+library(vars)
+
+# Load and preprocess the data
+data <- clean[c("year", "Temp", "Prec", "Humi", "bloom_doy")]
+
+# Convert the data to a time series
+ts_data <- ts(data[, -1], start = c(data[1, "year"], 1), frequency = 1)
+
+# Fit a VAR model with lag order 1
+model <- VAR(ts_data, p = 1)
+
+
+```
+
+
+```{r}
+# Print the model summary
+summary(model)
+
+
+
+```
+
+```{r}
+# Make a forecast for the next year
+forecast <- predict(model, n.ahead = 1)
+forecast
+```
+```{r}
+
+# Load and preprocess the data
+data2 <- clean[c("year", "Temp", "Prec", "Humi", "bloom_doy")]
+
+# Convert the data to a time series
+ts_data <- ts(data2[, -1], start = c(data[1, "year"], 1), frequency = 1)
+
+# Fit an ARIMA model with exogenous variables
+model <- auto.arima(ts_data[, "bloom_doy"], xreg = ts_data[, c("Temp", "Prec", "Humi")])
+
+# Print the model summary
+summary(model)
+
+# Make a forecast for the next year
+forecast <- forecast(model, xreg = tail(ts_data[, c("Temp", "Prec", "Humi")], n = 1))
+
+# Print the forecast
+print(forecast)
+
+```
+
+```{r}
+library(xgboost)
+
+# Load and preprocess the data
+data3 <- clean[c("year", "Temp", "Prec", "Humi", "bloom_doy")]
+
+
+train_idx <- sample(nrow(data3), 0.7 * nrow(data3)) # 70% of data for training
+
+
+# Split the data into training and testing sets
+train_size <- nrow(data3) - 1
+x_train <- as.matrix(data3[1:train_idx, c("Temp", "Prec", "Humi")])
+y_train <- data3[1:train_idx, "bloom_doy"]
+x_test <- as.matrix(data3[-train_idx, c("Temp", "Prec", "Humi")])
+y_test <- data3[-train_idx, "bloom_doy"]
+# Fit a GBM model
+model <- xgboost(data = x_train, label = y_train, nrounds = 100, objective = "reg:squarederror", max_depth = 3, eta = 0.1, gamma = 0.1, colsample_bytree = 0.8, subsample = 0.8)
+
+# Make a forecast for the next year
+forecast2 <- predict(model, newdata = x_test)
+
+# Print the forecast
+mean(abs(forecast2 - y_test))
+
+```
+
+```{r}
+library(Metrics)
+# Calculate the RMSE
+library(caret)
+rmse <- caret::RMSE(forecast2, y_test)
+print(rmse)
+```
+
