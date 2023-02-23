@@ -1,0 +1,21 @@
+```{r}
+library(class)
+# Load and preprocess the data
+data <- clean[c("year", "Temp", "Prec", "Humi", "bloom_doy")]
+train_size <- nrow(data3) - 1
+x_train <- as.matrix(data3[1:train_idx, c("Temp", "Prec", "Humi")])
+y_train <- data3[1:train_idx, "bloom_doy"]
+x_test <- as.matrix(data3[-train_idx, c("Temp", "Prec", "Humi")])
+y_test <- data3[-train_idx, "bloom_doy"]
+# Fit a k-NN model
+k <- 5  # number of neighbors
+knn_model <- knn(train = x_train, test = x_test, cl = y_train, k = k)
+
+# Make predictions on the test set
+knn_preds <- as.numeric(knn_model)
+
+# Calculate RMSE on the test set
+rmse <- sqrt(mean((knn_preds - y_test)^2))
+cat("Test set RMSE:", rmse, "\n")
+```
+
