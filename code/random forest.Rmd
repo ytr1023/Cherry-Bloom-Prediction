@@ -1,0 +1,32 @@
+```{r}
+library(readr)
+library(tseries)
+library(forecast)
+library(randomForest)
+clean=read.csv("clean_data.csv")
+clean=na.omit(clean)
+clean
+# Load and preprocess the data
+data3 <- clean[c("year", "Temp", "Prec", "Humi", "bloom_doy")]
+
+
+train_idx <- sample(nrow(data3), 0.7 * nrow(data3)) # 70% of data for training
+
+
+# Split the data into training and testing sets
+train_size <- nrow(data3) - 1
+x_train <- as.matrix(data3[1:train_idx, c("Temp", "Prec", "Humi")])
+y_train <- data3[1:train_idx, "bloom_doy"]
+x_test <- as.matrix(data3[-train_idx, c("Temp", "Prec", "Humi")])
+y_test <- data3[-train_idx, "bloom_doy"]
+# Fit a random forest model
+rf_model <- randomForest(x = x_train, y = y_train, ntree = 500, mtry = 2)
+
+# Make predictions on the test set
+rf_preds <- predict(rf_model, x_test)
+
+# Calculate RMSE on the test set
+rmse <- sqrt(mean((rf_preds - y_test)^2))
+cat("Test set RMSE:", rmse, "\n")
+```
+
