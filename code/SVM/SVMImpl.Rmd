@@ -37,15 +37,83 @@ df1 <- df1 %>%
   ungroup() %>%
   dplyr::select(-(location:year)) 
 df1 = data.frame(df1, Year = substring(df1$Date, 1, 4))
-year = unique(df1$Year)
-index = c()
-for (i in year){
+
+year = unique(df1$Year) # get unique years
+index = c() # init index
+for (i in year){ # create col of dayInYear 
   temp = length(df1$Year[df1$Year == i])
   index = append(index,c(1:temp))
 }
-length(index)
-length(df1$Year)
 df1 = data.frame(df1, dayInYear = index)
-df1
+df2023 = tail(df1, n = 33)
+df1 = df1[!df1$Year %in% df2023$Year,]
+df1 = subset(df1, select= -c(Date))
+df2023 = subset(df2023, select = -c(Date))
+df1 # final data
+df2023
+```
+
+**Obtain Training and Testing Data**
+```{r}
+length(year)
+set.seed(1)
+test = sample(year, 20, replace = F)
+df_test = df1[df1$Year %in% test,]
+df_train = df1[!(df1$Year %in% df_test$Year),]
+df_test[1:3] = data.frame(scale(df_test[1:3]))
+df_train[1:3] = data.frame(scale(df_train[1:3]))
+
+# df_train = subset(df_train, select= -c(Year))
+# df_test = subset(df_test, select= -c(Year))
+
+head(df_train)
+```
+
+
+**SVM Training**
+
+```{r}
+library(e1071)
+svmModel = svm(WhetherBloom~ ., data = df_train[-5], type = 'C-classification', kernal = 'radial basis')
+```
+
+**Testing**
+```{r}
+prediction = predict(svmModel, newdata = df_test[-5])
+length(prediction)
+```
+
+**Testing Error**
+```{r}
+# plain error
+cm = table(df_test[,4], prediction); 
+accuracy = (cm[1,1] + cm[2,2]) / sum(cm)
+
+#off days
+testdataInFrame = split(df_test, f = df_test$Year)
+yearAndBloomDate = data.frame()
+for (i in 1:length(testdataInFrame)){
+  a = testdataInFrame[[i]]
+  b = a[a$WhetherBloom == 1,]
+  c = min(b$dayInYear)
+  d = b[1,]$Year
+  yearAndBloomDate = rbind(yearAndBloomDate, data.frame(Year = d, Day = c))
+}
+
+predictYearAndBloomDate = data.frame()
+temp = data.frame(WhetherBloom = prediction, Year = df_test$Year, dayInYear = df_test$dayInYear)
+predictdataInFrame = split(temp, f = temp$Year)
+for (i in 1:length(predictdataInFrame)){
+  a = predictdataInFrame[[i]]
+  b = a[a$WhetherBloom == 1,]
+  c = min(b$dayInYear)
+  d = b[1,]$Year
+  predictYearAndBloomDate = rbind(predictYearAndBloomDate, data.frame(Year = d, Day = c))
+}
+
+a = yearAndBloomDate$Day
+b = predictYearAndBloomDate$Day
+sum(abs(a-b)) / length(predictdataInFrame)
+
 ```
 
