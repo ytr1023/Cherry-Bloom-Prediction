@@ -60,8 +60,24 @@ ts.avgbloom=ts(avgbloom)
 acf(ts.avgbloom,lag.max = 10)
 ar.mod4 = auto.arima(ts.avgbloom,ic="aic",allowmean=FALSE)
 ar.mod4
-fc5=forecast(ar.mod4, h=10, level=0.95)
+fc5=forecast(ar.mod4, h=10, level=0.9)
 fc5
+
+```
+```{r}
+autoplot(fc5)
+```
+```{r}
+fc10 = holt(ts.avgbloom, damped=TRUE, h =10,level = 0.95)
+autoplot(fc10)
 ```
 
+```{r}
+fc11 <- ses(ts.avgbloom, h=30,level=0.95)
+fc11$model
+```
+
+```{r}
+autoplot(fc11)
+```
 
