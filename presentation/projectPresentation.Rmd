@@ -13,17 +13,14 @@ In this paper, we explore the 6 predictors of daily average temperature, humidit
 
 # Data
 
-Instead of using the cherry blossom date, we use blossom day (from Jan 1 of each year) as our dependent variable. We also scraped weather data such as daily average temperature, humidity, pressure, wind speed, daily precipitation from [The Weather Channel](https://weather.com/?Goto=Redirected) using JavaScript. 
+Instead of using the cherry blossom date, we use blossom day (from Jan 1 of each year) as our dependent variable. We also scraped weather data such as daily average temperature, humidity, pressure, wind speed, daily precipitation from [The Weather Channel](https://weather.com/?Goto=Redirected) using JavaScript. Inspired by the paper [The prediction model of initial flowering based on accumulated temperature of different species peach in Longquanyi](https://dl.acm.org/doi/pdf/10.1145/3321408.3326690), we create a new variable called effective accumulated temperature, which measures 
 
-'date': date.toString(),
-                'average_temperature': sumTemp/i,
-                'total_precipitation': precip,
-                'humidity_rh': sumHumid/i,
-                'pressure_in': pressure/i,
-                'wind_speed': windSpd/i,
-                'max_temp': maxTemp
 
-create new variables 
+effective accumulated temperature
+
+When the effective accumulated temperature of peach blossoms reaches the accumulated temperature threshold, the corresponding date is the initial flowering period of the peach. 
+
+the accumulated temperature thresholds are different for 4 sites
 
 
 # Methodology
