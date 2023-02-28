@@ -1,0 +1,177 @@
+---
+title: "cum_heat_kyoto"
+output: html_document
+date: "2023-02-27"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Obtain necessary data
+
+```{r}
+weather <- read.csv("../../data/liestal/liestal.csv")
+bloom <- read.csv("../../data/liestal/liestaldoy.csv")
+
+cum.heat <- data.frame(bloom$year, bloom$bloom_doy)
+colnames(cum.heat) <- c("year", "doy")
+```
+
+
+# Add day of year to weather (for future calculation)
+
+```{r}
+current.year <- 0
+count <- 1
+weather.doy <- c()
+for(i in 1:nrow(weather)) {
+  this.year <- weather[i, 1] %/% 10000
+  if (this.year != current.year) {  # if year changed
+    current.year <- this.year
+    count <- 1
+  } else {
+    count <- count + 1
+  }
+  weather.doy <- append(weather.doy, count)
+}
+
+weather <- cbind(weather, weather.doy)
+```
+
+# conver max temp from Fahrenheit to celcuis
+
+```{r}
+max.celcuis <- (weather$Max.Temp - 32) * (5/9)
+weather <- cbind(weather, max.celcuis)
+```
+
+
+# List of potential start dates for cumulative heat calculation
+
+```{r}
+start.doy <- c(1:70)
+```
+
+
+# Create data frame containing calculation of cumulative heat from all potential start dates
+
+```{r}
+cumulative.heat <- c()
+dynamic.doy <- data.frame(bloom$year)
+
+for (startDate in start.doy) {
+  for (year in cum.heat$year) {
+    if (weather$Date[1] <= year* 10000 + 101) {
+      cumHeat <- 0
+      daily.temp <- weather[which(weather$Date %/% 10000 == year), c("max.celcuis")]
+      for(i in startDate:bloom[which(bloom$year == year), c("bloom_doy")]) {
+        cumHeat = cumHeat + daily.temp[i]
+      }
+      cumulative.heat <- append(cumulative.heat, cumHeat)
+    } else {
+      cumulative.heat <- append(cumulative.heat, NA)
+    }
+  }
+  dynamic.doy <- cbind(dynamic.doy, cumulative.heat)
+  cumulative.heat <- c()
+}
+```
+
+# name columns and remove years without temperature record
+
+```{r}
+colnames(dynamic.doy) <- c("year", start.doy)
+
+dynamic.doy <- na.omit(dynamic.doy)
+```
+
+
+# separate a testing set
+
+```{r}
+train <- dynamic.doy[c(1:(nrow(dynamic.doy)-10)), ]
+test <- tail(dynamic.doy, n = 10)
+```
+
+# Obtain mean cumulative heat for each start date in dynamic.doy
+
+```{r}
+mean.heat <- c()
+for(col in 2:ncol(train)) {
+  mean.heat <- append(mean.heat, mean(train[, col]))
+}
+```
+
+```{r}
+yearly.prediction <- data.frame()
+
+for (year in test$year) {
+  max.temps <- weather[which(weather$Date %/% 10000 == year) ,]$max.celcuis
+  predict.doys <- c()
+  for (startDoy in start.doy) {
+    target.heat <- mean.heat[startDoy]
+    cumHeat <- 0
+    predicted.doy <- startDoy
+    while (cumHeat < target.heat) {
+      predicted.doy = predicted.doy + 1
+      cumHeat = cumHeat + max.temps[predicted.doy]
+    }
+    predict.doys <- append(predict.doys, predicted.doy)
+  }
+  yearly.prediction <- rbind(yearly.prediction, predict.doys)
+}
+yearly.prediction <- cbind(test$year, yearly.prediction)
+colnames(yearly.prediction) <- c("year", start.doy)
+yearly.prediction
+```
+
+# Calculate error between prediction and actual day of blossom
+
+```{r}
+yearly.error.abs <- data.frame()
+true.doy <- tail(bloom, n = 10)$bloom_doy
+for (year in 1:length(test$year)){
+  error <- c()
+  for (i in start.doy) {
+    error <- append(error, abs(true.doy[year] - yearly.prediction[year, i + 1]))
+  }
+  yearly.error.abs <- rbind(yearly.error.abs, error)
+}
+
+yearly.error.abs <- cbind(test$year, yearly.error.abs)
+colnames(yearly.error.abs) <- c("year", start.doy)
+yearly.error.abs
+```
+
+# mean error for each selected start date & optimal start doy with minimal mean error
+
+```{r}
+mean.abs.error <- c()
+for (col in 2:ncol(yearly.error.abs)) {
+  mean.abs.error <- append(mean.abs.error, mean(yearly.error.abs[, col]))
+}
+
+mean.abs.error <- data.frame(start.doy, mean.abs.error)
+mean.abs.error
+mean.abs.error[which.min(mean.abs.error$mean.abs.error), ]
+```
+
+
+```{r}
+optimal.doy <- mean.abs.error[which.min(mean.abs.error$mean.abs.error), ]$start.doy
+temp.threshold <- dynamic.doy[, (optimal.doy + 1)]
+
+kyoto.cumulative <- data.frame(dynamic.doy$year, temp.threshold)
+colnames(kyoto.cumulative) <- c("year", "cumulative.temp")
+write.csv(kyoto.cumulative, "../../data/liestal/liestal_cumTemp.csv")
+```
+
+
+
+
+
+
+
+
+
