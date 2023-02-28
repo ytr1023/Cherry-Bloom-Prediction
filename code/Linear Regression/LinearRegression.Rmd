@@ -1,0 +1,76 @@
+---
+title: "Linear Regression"
+output: html_document
+date: "2023-02-28"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+df1 = read.csv("../../data/washington/washington_clean_combined.csv")
+df1 = df1[-2]
+set.seed(54567)
+test = sample(c(1:77), 15, replace = F)
+df_test = df1[df1$X %in% test,]
+df_train = df1[!(df1$X %in% df_test$X),]
+df_test = df_test[-1]
+df_train = df_train[-1]
+```
+
+```{r}
+mod1 = lm(bloom_doy ~ ., data = df_train)
+test_predicted = round(predict.lm(mod1, newdata = df_test))
+test_real = df_test["bloom_doy"]
+residual = abs(test_predicted - test_real)
+len = length(residual$bloom_doy)
+accNum = length(residual$bloom_doy[residual$bloom_doy <= 4] )
+accuracy = accNum / len; accuracy
+```
+
+# Subset Selection
+
+```{r}
+library(caret)
+library(leaps)
+library(tidyverse)
+
+mod2 = regsubsets(bloom_doy ~ ., data = df_train, nvmax = 5)
+summary(mod2)
+
+draw <- function(reg.summary, regfit){
+  par(mfrow=c(1,2))
+  plot(reg.summary$adjr2,xlab="Number of Variables",ylab="adjusted Rˆ2",type="l") 
+  best.mod.ind = which.min(reg.summary$cp) # which size of model gives the best Cp?
+  points(best.mod.ind,reg.summary$adjr2[best.mod.ind], col="red",cex=2,pch=20)
+  plot(reg.summary$cp,xlab="Number of Variables",ylab="Cp",type="l")
+  points(best.mod.ind,reg.summary$cp[best.mod.ind], col="red",cex=2,pch=20)
+  plot(reg.summary$bic,xlab="Number of Variables",ylab="BIC",type="l")
+  points(best.mod.ind,reg.summary$bic[best.mod.ind], col="red",cex=2,pch=20)
+  plot(regfit,scale="bic")
+  coef(regfit,best.mod.ind)
+}
+draw(summary(mod2), mod2)
+```
+
+```{r}
+predict.regsubsets <- function(object, newdata, id, ...) {
+  form <- as.formula(object[["call"]][[2]])
+  mat <- model.matrix(form, newdata)
+  coefi <- coef(object, id = id)
+  xvars <- names(coefi)
+  # Matrix
+  pred_mat <- mat[, xvars] %*% coefi
+  # Vector
+  pred <- as.numeric(pred_mat)
+  names(pred) <- rownames(mat)
+  pred
+}
+
+subPred = predict(mod2, newdata = df_test, 3)
+resSub = abs(subPred - test_real)
+accNum = length(which(resSub <= 4))
+accSub = accNum / len; accSub
+```
+

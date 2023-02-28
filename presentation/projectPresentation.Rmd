@@ -7,11 +7,23 @@ output: html_document
 
 # Final Paper 
 
-Many cities are known for their cherry blossom viewing sites, and every year, thousands of tourists visit those places to watch cherry blossoms. However, a lot of tourists  on the social media complained that either they went to the viewing sites but the cherry had not bloomed or the cherry had already started to wither. Two of our team member had this experience themselves. Thus, it is crucial for the tourists to know the cherry blossom dates to arrange their trips, which will help them save money and time. 
+Many cities are known for their cherry blossom viewing sites, and every year, thousands of tourists visit those places to watch cherry blossoms. However, many tourists on social media complained that either they went to the viewing sites, but the cherry had not bloomed, or the cherry had already started to wither. Two of our team members had this experience themselves. Thus, knowing the cherry blossom dates is beneficial for the tourists to arrange their trips, helping them save money and time. 
 
-In this paper, we explore the 6 predictors daily precipitation, average temperature, relative humidity, wind speed, UV index, and pressure, utilizing various models to predict cherry blossom dates at Washington, D.C. (USA), Kyoto (Japan), Liestal-Weideli (Switzerland) and Vancouver, BC (Canada). 
+In this paper, we explore the 6 predictors of daily average temperature, humidity, pressure, wind speed, daily precipitation, and modified accumulated temperature, utilizing *various models* to predict cherry blossom dates at Washington, D.C. (USA), Kyoto (Japan), Liestal-Weideli (Switzerland) and Vancouver, BC (Canada). 
 
 # Data
+
+Instead of using the cherry blossom date, we use blossom day (from Jan 1 of each year) as our dependent variable. We also scraped weather data such as daily average temperature, humidity, pressure, wind speed, daily precipitation from [The Weather Channel](https://weather.com/?Goto=Redirected) using JavaScript. 
+
+'date': date.toString(),
+                'average_temperature': sumTemp/i,
+                'total_precipitation': precip,
+                'humidity_rh': sumHumid/i,
+                'pressure_in': pressure/i,
+                'wind_speed': windSpd/i,
+                'max_temp': maxTemp
+
+create new variables 
 
 
 # Methodology
