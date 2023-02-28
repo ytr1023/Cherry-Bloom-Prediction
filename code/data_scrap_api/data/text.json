@@ -1,0 +1,15 @@
+{
+    "metadata": {
+        "transaction_id": "1675459740845:18122f2b5b51160426980c07e80f127d",
+        "status_code": 400
+    },
+    "success": false,
+    "errors": [
+        {
+            "error": {
+                "code": "QPV-0001",
+                "message": "The query field 'endDate' contains an invalid value."
+            }
+        }
+    ]
+}

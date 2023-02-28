@@ -55,18 +55,26 @@ df2023
 
 **Obtain Training and Testing Data**
 ```{r}
+library(dplyr)
 length(year)
 set.seed(1)
 test = sample(year, 20, replace = F)
 df_test = df1[df1$Year %in% test,]
 df_train = df1[!(df1$Year %in% df_test$Year),]
-df_test[1:3] = data.frame(scale(df_test[1:3]))
-df_train[1:3] = data.frame(scale(df_train[1:3]))
+# df_test[1:3] = data.frame(scale(df_test[1:3]))
+# df_train[1:3] = data.frame(scale(df_train[1:3]))
 
-# df_train = subset(df_train, select= -c(Year))
-# df_test = subset(df_test, select= -c(Year))
+df_test <- df_test %>%
+  mutate(WhetherBloom = ifelse(WhetherBloom == 0, 'NO', WhetherBloom))
+df_test <- df_test %>%
+  mutate(WhetherBloom = ifelse(WhetherBloom == 1, 'YES', WhetherBloom))
+df_train <- df_train %>%
+  mutate(WhetherBloom = ifelse(WhetherBloom == 0, 'NO', WhetherBloom))
+df_train <- df_train %>%
+  mutate(WhetherBloom = ifelse(WhetherBloom == 1, 'YES', WhetherBloom))
 
-head(df_train)
+df_test$WhetherBloom = factor(df_test$WhetherBloom, levels = c('NO', 'YES'))
+df_train$WhetherBloom = factor(df_train$WhetherBloom, levels = c('NO', 'YES'))
 ```
 
 
@@ -74,12 +82,17 @@ head(df_train)
 
 ```{r}
 library(e1071)
-svmModel = svm(WhetherBloom~ ., data = df_train[-5], type = 'C-classification', kernal = 'radial basis')
+svmModel = svm(formula = WhetherBloom~ ., data = df_train[-8], type = 'C-classification', kernal = 'radial basis', cost = 0.1)
+
+# set.seed (1)
+# tune.out=tune(svm ,WhetherBloom~.,data=df_train ,kernel ="linear", 
+#               ranges =list(cost=c(0.001,0.01,0.1, 1,5,10,100)))
+# summary(tune.out)
 ```
 
 **Testing**
 ```{r}
-prediction = predict(svmModel, newdata = df_test[-5])
+prediction = predict(svmModel, newdata = df_test[-8])
 length(prediction)
 ```
 
@@ -94,7 +107,7 @@ testdataInFrame = split(df_test, f = df_test$Year)
 yearAndBloomDate = data.frame()
 for (i in 1:length(testdataInFrame)){
   a = testdataInFrame[[i]]
-  b = a[a$WhetherBloom == 1,]
+  b = a[a$WhetherBloom == 'YES',]
   c = min(b$dayInYear)
   d = b[1,]$Year
   yearAndBloomDate = rbind(yearAndBloomDate, data.frame(Year = d, Day = c))
@@ -105,7 +118,7 @@ temp = data.frame(WhetherBloom = prediction, Year = df_test$Year, dayInYear = df
 predictdataInFrame = split(temp, f = temp$Year)
 for (i in 1:length(predictdataInFrame)){
   a = predictdataInFrame[[i]]
-  b = a[a$WhetherBloom == 1,]
+  b = a[a$WhetherBloom == 'YES',]
   c = min(b$dayInYear)
   d = b[1,]$Year
   predictYearAndBloomDate = rbind(predictYearAndBloomDate, data.frame(Year = d, Day = c))
@@ -113,7 +126,15 @@ for (i in 1:length(predictdataInFrame)){
 
 a = yearAndBloomDate$Day
 b = predictYearAndBloomDate$Day
-sum(abs(a-b)) / length(predictdataInFrame)
+averageOffDays = sum(abs(a-b)) / length(predictdataInFrame); averageOffDays
+accurateNum = 0
+diff = abs(a-b)
+for (i in 1:length(predictdataInFrame)){
+  if((diff[i] - 4) <= 0){
+    accurateNum = accurateNum + 1
+  }
+}
+accuracy = accurateNum / length(predictdataInFrame); accuracy
 
 ```
 

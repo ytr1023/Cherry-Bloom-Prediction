@@ -1,0 +1,67 @@
+---
+title: "kyoto ARIMA "
+output: html_notebook
+---
+
+```{r}
+library(readr)
+library(tseries)
+library(forecast)
+clean=read.csv("kyoto.csv")
+clean=na.omit(clean)
+clean
+```
+```{r}
+avgprec <- clean[c("Total.Precipitation")]
+ts.avgprec=ts(avgprec)
+acf(ts.avgprec,lag.max = 10)
+```
+```{r}
+ar.mod = auto.arima(ts.avgprec,ic="bic",allowmean=FALSE)
+ar.mod
+fc1=forecast(ar.mod, h=10, level=0.95)
+fc1
+
+```
+```{r}
+avghumi <- clean[c("Humidity..rh.")]
+ts.avghumi=ts(avghumi)
+acf(ts.avghumi,lag.max = 30)
+ar.mod1 = auto.arima(ts.avghumi,ic="aic",allowmean=FALSE)
+ar.mod1
+fc2=forecast(ar.mod1, h=10, level=0.95)
+fc2
+```
+
+```{r}
+avgwspd <- clean[c("Wind.Speed..mph.")]
+ts.avgwspd=ts(avgwspd)
+acf(ts.avgwspd,lag.max = 30)
+ar.mod2 = auto.arima(ts.avgwspd,ic="aic",allowmean=FALSE)
+ar.mod2
+fc3=forecast(ar.mod2, h=10, level=0.95)
+fc3
+```
+
+```{r}
+avgpressure <- clean[c("Pressure..in.")]
+ts.avgpressure=ts(avgpressure)
+acf(ts.avgpressure,lag.max = 30)
+ar.mod3 = auto.arima(ts.avgpressure,ic="aic",allowmean=FALSE)
+ar.mod3
+fc4=forecast(ar.mod3, h=10, level=0.95)
+fc4
+```
+
+```{r}
+clean2=read.csv("kyotodoy.csv")
+avgbloom <- clean2[c("bloom_doy")]
+ts.avgbloom=ts(avgbloom)
+acf(ts.avgbloom,lag.max = 10)
+ar.mod4 = auto.arima(ts.avgbloom,ic="aic",allowmean=FALSE)
+ar.mod4
+fc5=forecast(ar.mod4, h=10, level=0.95)
+fc5
+```
+
+

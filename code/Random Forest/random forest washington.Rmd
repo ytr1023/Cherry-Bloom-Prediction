@@ -1,0 +1,45 @@
+```{r}
+library(readr)
+library(tseries)
+library(forecast)
+library(randomForest)
+clean=read.csv("washington_clean_combined.csv")
+clean=na.omit(clean)
+set.seed(12345)
+# Load and preprocess the data
+data3 <- clean[c("year", "Temp", "Prec", "Humi", "bloom_doy","wspd","pressure")]
+
+
+train_idx <- sample(nrow(data3), 0.9 * nrow(data3)) # 70% of data for training
+
+
+# Split the data into training and testing sets
+train_size <- nrow(data3) - 1
+x_train <- as.matrix(data3[1:train_idx, c("Temp", "Prec", "Humi","wspd","pressure")])
+y_train <- data3[1:train_idx, "bloom_doy"]
+x_test <- as.matrix(data3[-train_idx, c("Temp", "Prec", "Humi","wspd","pressure")])
+y_test <- data3[-train_idx, "bloom_doy"]
+# Fit a random forest model
+rf_model <- randomForest(x = x_train, y = y_train, ntree = 500, mtry = 2)
+
+# Make predictions on the test set
+rf_preds <- predict(rf_model, x_test)
+
+# Calculate RMSE on the test set
+rmse <- mean(abs(rf_preds - y_test))
+cat("Test set RMSE:", rmse, "\n")
+sum = ifelse(abs(rf_preds-y_test)<=3, 1,0)
+data.frame(rf_preds, y_test)
+sum(sum)/8
+
+
+```
+
+predict
+```{r}
+new_data <- read.csv("washington_clean_combined.csv")
+x_new <- as.matrix(new_data[, c("Temp", "Prec", "Humi","wspd","pressure")])
+rf_preds_new <- predict(rf_model, x_new)
+cat("Predicted bloom_doy values:", rf_preds_new, "\n")
+```
+
