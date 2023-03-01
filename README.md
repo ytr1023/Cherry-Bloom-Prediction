@@ -18,3 +18,6 @@ The four folders named by the cities contain the corresponding data. For example
 ```
 
 Under ```Cherry-Bloom-Prediciton/code```, there are directories named by different algorithems. In each folder, there's a rmd file and a PDF/HTML file. The rmd file is our source code and the PDF/HTML file is knitting result by RStudio.
+
+We also have tried implementing LSTM. It's written in Google's colab using TensorFlow.
+Link to LSTM model: https://colab.research.google.com/drive/11ZU6lt9vRmuIFNyMoOaY6RsCwEV3dIjG#scrollTo=k-KWFLiH45ZZ
