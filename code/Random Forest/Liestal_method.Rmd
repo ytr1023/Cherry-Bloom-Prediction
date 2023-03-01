@@ -1,0 +1,79 @@
+---
+title: "Untitled"
+author: "Tianrui Ye"
+date: "2023-03-01"
+output: html_document
+---
+```{r}
+set.seed(123)
+df <- read.csv("Liestal_prediction.csv")
+df1 <- read.csv("liestal_yearly.csv")
+df2 <- read.csv("liestaldoy.csv")
+```
+
+```{r}
+
+liestal <- left_join(df1, df2, by = "year")
+liestal <- liestal[-27, -c(1,9:13)]
+liestal
+```
+
+```{r}
+library(lubridate)
+library(tidyverse)
+
+df$Date = year(df$Date)
+df <- df %>%
+  group_by(Date) %>%
+  summarise(humidity = mean(Humidity), avg.temp = mean(Temperature), pressure = mean(Pressure), windspd = mean(Wind), max.temp = mean(Max.Temp)) %>%
+  ungroup()
+df
+```
+
+```{r}
+library(randomForest)
+# Fit a random forest model
+train <- liestal[1:20, ]
+test <- liestal[21:26, ]
+model <- randomForest(bloom_doy ~ avg.temp + humidity + pressure + windspd + max.temp, data = liestal, ntree = 1000)
+
+# Make predictions on the test set
+predictions <- predict(model, newdata = df)
+
+# Print the predicted values
+print(predictions)
+```
+
+```{r}
+aa <- read.csv("washington_yearly.csv")
+aa
+```
+
+```{r}
+
+df <- read.csv("Liestal_prediction.csv")
+```
+
+```{r}
+df$Date = year(df$Date)
+df <- df %>%
+  group_by(Date) %>%
+  summarise(Humi = mean(Humidity), Temp = mean(Temperature), pressure = mean(Pressure), wspd = mean(Wind), max.temp = mean(Max.Temp)) %>%
+  ungroup()
+df
+```
+
+
+
+```{r}
+library(randomForest)
+# Fit a random forest model
+model <- randomForest(bloom_doy ~ Temp + Humi + pressure + wspd, data = aa, ntree = 1000)
+
+# Make predictions on the test set
+predictions <- predict(model, newdata = df)
+
+# Print the predicted values
+print(predictions)
+```
+

@@ -1,0 +1,61 @@
+---
+title: "Untitled"
+author: "Tianrui Ye"
+date: "2023-02-28"
+output: html_document
+---
+
+```{r}
+setwd("C:/Users/yetia/Desktop")
+df <- read.csv("liestaldoy.csv")
+df1 <- read.csv("liestal_yearly.csv")
+df
+```
+
+```{r}
+library(dplyr)
+df2 <- left_join(df, df1, by="year")
+df2 <- na.omit(df2)
+df2
+```
+
+```{r}
+
+aaa <- read.csv("Liestal_prediction.csv")
+library(lubridate)
+library(tidyverse)
+
+aaa$Date = year(aaa$Date)
+aaa <- aaa %>%
+  group_by(Date) %>%
+  summarise(humidity = mean(Humidity), avg.temp = mean(Temperature), pressure = mean(Pressure), windspd = mean(Wind), max.temp = mean(Max.Temp)) %>%
+  ungroup()
+aaa
+```
+
+```{r}
+library(randomForest)
+
+# Load the dataset
+set.seed(123)
+# Split the data into training and test sets
+trainIndex <- sample(1:nrow(df2), 0.7*nrow(df2))
+trainData <- df2[trainIndex, ]
+testData <- df2[-trainIndex, ]
+
+# Train the random forest model
+model <- randomForest(bloom_doy ~ avg.temp + humidity + pressure + windspd + max.temp, data = df2, ntree = 500)
+
+# Make predictions on the test set
+predictions <- predict(model, aaa)
+# Evaluate the accuracy of the model
+predictions
+testData$bloom_doy
+aaa = ifelse(round(predictions)-testData$bloom_doy<=3, 1,0)
+count_ones <- sum(aaa == 1)
+count_ones/nrow(testData)
+# Evaluate the model
+accuracy <- sum(predictions == testData$date_of_bloom) / nrow(testData)
+print(paste("Accuracy:", accuracy))
+```
+

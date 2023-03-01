@@ -1,0 +1,80 @@
+---
+title: "Untitled"
+author: "Tianrui Ye"
+date: "2023-02-28"
+output: html_document
+---
+
+```{r}
+df <- read.csv("C:/Users/yetia/OneDrive - University of North Carolina at Chapel Hill/Cherry yummy/peak-bloom-prediction-main (1)/peak-bloom-prediction-main/data/USA-NPN_status_intensity_observations_data.csv")
+df
+```
+
+```{r}
+ccc <- read.csv("C:/Users/yetia/Desktop/Vancouver_prediction.csv")
+sum <- 0
+for (i in 60:length(ccc$X)){
+  sum <- sum + ccc$Temperature[i]
+  if(sum > 800){
+    return(i)
+  }
+}
+i
+ccc
+```
+
+
+```{r}
+#df1 <- subset(df, select=c(Observation_ID, Update_Datetime, Site_ID, State, Species_ID, Common_Name, Kingdom, Individual_ID, Phenophase_ID, Phenophase_Description, Observation_Date, Phenophase_Status, Intensity_Category_ID, Intensity_Value, Abundance_Value, AGDD_in_F))
+df1 <- subset(df, select=c(Latitude, Longitude, Elevation_in_Meters, Day_of_Year, AGDD_in_F, Accum_Prcp))
+df1
+```
+
+
+```{r}
+library(randomForest)
+trainIndex <- sample(1:nrow(df1), 0.7*nrow(df1))
+trainData <- df1[trainIndex, ]
+testData <- df1[-trainIndex, ]
+
+# Create the model
+model <- randomForest(Day_of_Year ~ ., data=trainData, ntree=500)
+
+# Make predictions on the test data
+predictions <- predict(model, testData)
+# Evaluate the accuracy of the model
+aaa = ifelse(round(predictions)-testData$Day_of_Year<=3, 1,0)
+count_ones <- sum(aaa == 1)
+count_ones/nrow(testData)
+accuracy <- sum(round(predictions) == testData$Day_of_Year) / nrow(testData)
+print(paste0("Accuracy: ", round(accuracy, 2)))
+
+varImpPlot(model, main="Variable Importance Plot")
+```
+
+
+
+
+```{r}
+my_df <- data.frame(
+  Latitude = c(49.2237, 49.2237, 49.2237, 49.2237, 49.2237, 49.2237, 49.2237, 49.2237, 49.2237, 49.2237),
+  Longitude = c(-123.1636,-123.1636,-123.1636,-123.1636,-123.1636,-123.1636,-123.1636,-123.1636,-123.1636,-123.1636),
+  Elevation_in_Meters = c(24,24,24,24,24,24,24,24,24,24),
+  AGDD_in_F = c(950, 945,940.12, 938, 932, 920, 920, 920, 920, 910.81),
+  Accum_Prcp = c(260,250,220,180,150,140,140,140,140,140)
+)
+df2 <- read.csv("C:/Users/yetia/OneDrive - University of North Carolina at Chapel Hill/Cherry yummy/peak-bloom-prediction-main (1)/peak-bloom-prediction-main/data/vancouver_weather.csv")
+df2
+df2 <- filter(df2, df2$Date %/% 10000 == 2022)
+df2 <- df2[1:86,]
+predictions <- predict(model, my_df)
+predictions
+```
+```{r}
+df2$Min.Temp = df2$Average.Temperature*2 - df2$Max.Temp
+df2$AGDD = (df2$Max.Temp+df2$Min.Temp)/2 - 32
+df2$AGDD <- ifelse(df2$AGDD < 0, 0, df2$AGDD)
+sum(df2$AGDD)
+df2
+```
+
