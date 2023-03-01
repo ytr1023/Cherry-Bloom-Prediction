@@ -3,7 +3,7 @@
 
 ## Group Member
 
-Wei Shan, Xi Du, Jeff Zhuo, Yuewei Wang, Tianrui Ye
+Jeff Zhuo, Tianrui Ye, Wei Shan, Xi Du, Yuewei Wang
 
 ## How to check out our data?
 
