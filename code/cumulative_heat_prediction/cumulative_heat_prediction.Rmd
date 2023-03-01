@@ -10,11 +10,253 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Predict Cherry Blossom Using Standard Cumulative Heat
 
-## Cumulative Heat Standard Accuracy Rate (3 days)
+### Listal
 
 ```{r}
+library(dplyr)
 cum.heat.std <- read.csv("../../data/cumulative_heat_standard.csv")
+listal_pred = read.csv("../../data/FuturePredictors/Liestal_prediction.csv")
+regex0 = "^2023.*"
+regex1 = "^2024.*"
+regex2 = "^2025.*"
+regex3 = "^2026.*"
+regex4 = "^2027.*"
+regex5 = "^2028.*"
+regex6 = "^2029.*"
+regex7 = "^2030.*"
+regex8 = "^2031.*"
+regex9 = "^2032.*"
+listal_2023 = grepl(regex0, listal_pred$Date)
+listal_2024 = grepl(regex1, listal_pred$Date)
+listal_2025 = grepl(regex2, listal_pred$Date)
+listal_2026 = grepl(regex3, listal_pred$Date)
+listal_2027 = grepl(regex4, listal_pred$Date)
+listal_2028 = grepl(regex5, listal_pred$Date)
+listal_2029 = grepl(regex6, listal_pred$Date)
+listal_2030 = grepl(regex7, listal_pred$Date)
+listal_2031 = grepl(regex8, listal_pred$Date)
+listal_2032 = grepl(regex9, listal_pred$Date)
 
+listal_temp_2023 = listal_pred$Temperature[listal_2023]
+listal_temp_2023 = (listal_temp_2023 - 32) * 5 / 9
+listal_date_2023 = cum.heat.std$Start.Date[cum.heat.std$Region == "Washington"]
+listal_temp_2023 = listal_temp_2023[-1:-25]
+sum = 0
+for (i in 1:length(listal_temp_2023)){
+  if(sum >= cum.heat.std$Threshold_C[cum.heat.std$Region == "Washington"]){
+    print(i + 25)
+    break
+  }else{
+    sum = sum + listal_temp_2023[i]
+  }
+}
+
+listal_temp_2024 = listal_pred$Temperature[listal_2024]
+listal_temp_2024 = (listal_temp_2024 - 32) * 5 / 9
+listal_date_2024 = cum.heat.std$Start.Date[cum.heat.std$Region == "Washington"]
+listal_temp_2024 = listal_temp_2024[-1:-25]
+sum = 0
+for (i in 1:length(listal_temp_2024)){
+  if(sum >= cum.heat.std$Threshold_C[cum.heat.std$Region == "Washington"]){
+    print(i + 25)
+    break
+  }else{
+    sum = sum + listal_temp_2024[i]
+  }
+}
+
+listal_temp_2025 = listal_pred$Temperature[listal_2025]
+listal_temp_2025 = (listal_temp_2025 - 32) * 5 / 9
+listal_date_2025 = cum.heat.std$Start.Date[cum.heat.std$Region == "Washington"]
+listal_temp_2025 = listal_temp_2025[-1:-25]
+sum = 0
+for (i in 1:length(listal_temp_2025)){
+  if(sum >= cum.heat.std$Threshold_C[cum.heat.std$Region == "Washington"]){
+    print(i + 25)
+    break
+  }else{
+    sum = sum + listal_temp_2025[i]
+  }
+}
+
+listal_temp_2026 = listal_pred$Temperature[listal_2026]
+listal_temp_2026 = (listal_temp_2026 - 32) * 5 / 9
+listal_date_2026 = cum.heat.std$Start.Date[cum.heat.std$Region == "Washington"]
+listal_temp_2026 = listal_temp_2026[-1:-25]
+sum = 0
+for (i in 1:length(listal_temp_2026)){
+  if(sum >= cum.heat.std$Threshold_C[cum.heat.std$Region == "Washington"]){
+    print(i + 25)
+    break
+  }else{
+    sum = sum + listal_temp_2026[i]
+  }
+}
+
+listal_temp_2027 = listal_pred$Temperature[listal_2027]
+listal_temp_2027 = (listal_temp_2027 - 32) * 5 / 9
+listal_date_2027 = cum.heat.std$Start.Date[cum.heat.std$Region == "Washington"]
+listal_temp_2027 = listal_temp_2027[-1:-25]
+sum = 0
+for (i in 1:length(listal_temp_2027)){
+  if(sum >= cum.heat.std$Threshold_C[cum.heat.std$Region == "Washington"]){
+    print(i + 25)
+    break
+  }else{
+    sum = sum + listal_temp_2027[i]
+  }
+}
+
+listal_temp_2028 = listal_pred$Temperature[listal_2028]
+listal_temp_2028 = (listal_temp_2028 - 32) * 5 / 9
+listal_date_2028 = cum.heat.std$Start.Date[cum.heat.std$Region == "Washington"]
+listal_temp_2028 = listal_temp_2028[-1:-25]
+sum = 0
+for (i in 1:length(listal_temp_2028)){
+  if(sum >= cum.heat.std$Threshold_C[cum.heat.std$Region == "Washington"]){
+    print(i + 25)
+    break
+  }else{
+    sum = sum + listal_temp_2028[i]
+  }
+}
+
+listal_temp_2029 = listal_pred$Temperature[listal_2029]
+listal_temp_2029 = (listal_temp_2029 - 32) * 5 / 9
+listal_date_2029 = cum.heat.std$Start.Date[cum.heat.std$Region == "Washington"]
+listal_temp_2029 = listal_temp_2029[-1:-25]
+sum = 0
+for (i in 1:length(listal_temp_2029)){
+  if(sum >= cum.heat.std$Threshold_C[cum.heat.std$Region == "Washington"]){
+    print(i + 25)
+    break
+  }else{
+    sum = sum + listal_temp_2029[i]
+  }
+}
+
+listal_temp_2030 = listal_pred$Temperature[listal_2030]
+listal_temp_2030 = (listal_temp_2030 - 32) * 5 / 9
+listal_date_2030 = cum.heat.std$Start.Date[cum.heat.std$Region == "Washington"]
+listal_temp_2030 = listal_temp_2030[-1:-25]
+sum = 0
+for (i in 1:length(listal_temp_2030)){
+  if(sum >= cum.heat.std$Threshold_C[cum.heat.std$Region == "Washington"]){
+    print(i + 25)
+    break
+  }else{
+    sum = sum + listal_temp_2030[i]
+  }
+}
+
+listal_temp_2031 = listal_pred$Temperature[listal_2031]
+listal_temp_2031 = (listal_temp_2031 - 32) * 5 / 9
+listal_date_2031 = cum.heat.std$Start.Date[cum.heat.std$Region == "Washington"]
+listal_temp_2031 = listal_temp_2031[-1:-25]
+sum = 0
+for (i in 1:length(listal_temp_2031)){
+  if(sum >= cum.heat.std$Threshold_C[cum.heat.std$Region == "Washington"]){
+    print(i + 25)
+    break
+  }else{
+    sum = sum + listal_temp_2031[i]
+  }
+}
+```
+
+**The predicted blossom day of the year for the following ten years starting from 2023 is: Apr 29, Apr 28, Apr 28, Apr 27, Apr 27, Apr 26, Apr 26, Apr 26, Apr, 25, Apr 25 **
+
+### Washington
+
+```{r}
+Washington_pred = read.csv("../../data/FuturePredictors/Washington_prediction.csv")
+Washington_2023 = grepl(regex0, Washington_pred$Date)
+Washington_2024 = grepl(regex1, Washington_pred$Date)
+Washington_2025 = grepl(regex2, Washington_pred$Date)
+Washington_2026 = grepl(regex3, Washington_pred$Date)
+Washington_2027 = grepl(regex4, Washington_pred$Date)
+Washington_2028 = grepl(regex5, Washington_pred$Date)
+Washington_2029 = grepl(regex6, Washington_pred$Date)
+Washington_2030 = grepl(regex7, Washington_pred$Date)
+Washington_2031 = grepl(regex8, Washington_pred$Date)
+Washington_2032 = grepl(regex9, Washington_pred$Date)
+
+Washington_temp_2023 = Washington_pred$Temperature[Washington_2023]
+Washington_temp_2023 = (Washington_temp_2023 - 32) * 5 / 9
+Washington_date_2023 = cum.heat.std$Start.Date[cum.heat.std$Region == "Washington"]
+Washington_temp_2023 = Washington_temp_2023[-1:-25]
+sum = 0
+for (i in 1:length(Washington_temp_2023)){
+  if(sum >= cum.heat.std$Threshold_C[cum.heat.std$Region == "Washington"]){
+    print(i + 25)
+    break
+  }else{
+    sum = sum + Washington_temp_2023[i]
+  }
+}
+
+Washington_temp_2024 = Washington_pred$Temperature[Washington_2024]
+Washington_temp_2024 = (Washington_temp_2024 - 32) * 5 / 9
+Washington_date_2024 = cum.heat.std$Start.Date[cum.heat.std$Region == "Washington"]
+Washington_temp_2024 = Washington_temp_2024[-1:-25]
+sum = 0
+for (i in 1:length(Washington_temp_2024)){
+  if(sum >= cum.heat.std$Threshold_C[cum.heat.std$Region == "Washington"]){
+    print(i + 25)
+    break
+  }else{
+    sum = sum + Washington_temp_2024[i]
+  }
+}
+
+Washington_temp_2025 = Washington_pred$Temperature[Washington_2025]
+Washington_temp_2025 = (Washington_temp_2025 - 32) * 5 / 9
+Washington_date_2025 = cum.heat.std$Start.Date[cum.heat.std$Region == "Washington"]
+Washington_temp_2025 = Washington_temp_2025[-1:-25]
+sum = 0
+for (i in 1:length(Washington_temp_2025)){
+  if(sum >= cum.heat.std$Threshold_C[cum.heat.std$Region == "Washington"]){
+    print(i + 25)
+    break
+  }else{
+    sum = sum + Washington_temp_2025[i]
+  }
+}
+
+Washington_temp_2026 = Washington_pred$Temperature[Washington_2026]
+Washington_temp_2026 = (Washington_temp_2026 - 32) * 5 / 9
+Washington_date_2026 = cum.heat.std$Start.Date[cum.heat.std$Region == "Washington"]
+Washington_temp_2026 = Washington_temp_2026[-1:-25]
+sum = 0
+for (i in 1:length(Washington_temp_2026)){
+  if(sum >= cum.heat.std$Threshold_C[cum.heat.std$Region == "Washington"]){
+    print(i + 25)
+    break
+  }else{
+    sum = sum + Washington_temp_2026[i]
+  }
+}
+
+Washington_temp_2027 = Washington_pred$Temperature[Washington_2027]
+Washington_temp_2027 = (Washington_temp_2027 - 32) * 5 / 9
+Washington_date_2027 = cum.heat.std$Start.Date[cum.heat.std$Region == "Washington"]
+Washington_temp_2027 = Washington_temp_2027[-1:-25]
+sum = 0
+for (i in 1:length(Washington_temp_2027)){
+  if(sum >= cum.heat.std$Threshold_C[cum.heat.std$Region == "Washington"]){
+    print(i + 25)
+    break
+  }else{
+    sum = sum + Washington_temp_2027[i]
+  }
+}
+
+Washington_temp_2028 = Washington_pred$Temperature[Washington_2028]
+Washington_temp_2028 = (Washington_temp_2028 - 32) * 5 / 9
+Washington_date_2028 = cum.heat.std$Start.Date[cum.heat.std$Region == "Washington"]
+Washington_temp_2028 = Washington_temp_2028[-1:-25]
+sum = 0
 
 ```
 
+**The predicted blossom day of the year for the following ten years starting from 2023 is: Apr 19, Apr 18, Apr 18, Apr 18, Apr 18, Apr 17, Apr 17, Apr 17, Apr, 16, Apr 16 **
