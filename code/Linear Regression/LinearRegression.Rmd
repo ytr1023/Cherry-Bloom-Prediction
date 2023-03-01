@@ -8,10 +8,13 @@ date: "2023-02-28"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Washington
+
+### Linear Regression
 ```{r}
 df1 = read.csv("../../data/washington/washington_clean_combined.csv")
 df1 = df1[-2]
-set.seed(54567)
+set.seed(3)
 test = sample(c(1:77), 15, replace = F)
 df_test = df1[df1$X %in% test,]
 df_train = df1[!(df1$X %in% df_test$X),]
@@ -25,11 +28,13 @@ test_predicted = round(predict.lm(mod1, newdata = df_test))
 test_real = df_test["bloom_doy"]
 residual = abs(test_predicted - test_real)
 len = length(residual$bloom_doy)
-accNum = length(residual$bloom_doy[residual$bloom_doy <= 4] )
+accNum = length(residual$bloom_doy[residual$bloom_doy <= 3] )
 accuracy = accNum / len; accuracy
 ```
 
-# Subset Selection
+**Linear Regression Accuracy on Testing set: 0.3333333**
+
+### Subset Selection
 
 ```{r}
 library(caret)
@@ -70,7 +75,100 @@ predict.regsubsets <- function(object, newdata, id, ...) {
 
 subPred = predict(mod2, newdata = df_test, 3)
 resSub = abs(subPred - test_real)
-accNum = length(which(resSub <= 4))
+accNum = length(which(resSub <= 3))
 accSub = accNum / len; accSub
 ```
+**Subset Selection Accuracy on Testing set: 0.4**
 
+\newpage
+
+# Kyoto
+
+### Linear Regression
+
+```{r}
+df2 = read.csv("../../data/kyoto/kyotodoy_yearly.csv")
+df2 = df2[-2]
+set.seed(3)
+test_kyoto = sample(c(1:26), 5, replace = F)
+df_test_kyoto = df2[df2$X %in% test_kyoto,]
+df_train_kyoto = df2[!(df2$X %in% df_test_kyoto$X),]
+df_test_kyoto = df_test_kyoto[-1]
+df_train_kyoto = df_train_kyoto[-1]
+```
+
+```{r}
+mod3 = lm(bloom_doy ~ ., data = df_train_kyoto)
+test_predicted_kyoto = round(predict.lm(mod3, newdata = df_test_kyoto))
+test_real_kyoto = df_test_kyoto["bloom_doy"]
+residual_kyoto = abs(test_predicted_kyoto - test_real_kyoto)
+len_kyoto = length(residual$bloom_doy)
+accNum_kyoto = length(residual$bloom_doy[residual$bloom_doy <= 3] )
+accuracy_kyoto = accNum_kyoto / len_kyoto; accuracy_kyoto
+```
+
+**Linear Regression Accuracy on Testing set: 0.3333333**
+
+### Subset Selection
+```{r}
+mod4 = regsubsets(bloom_doy ~ ., data = df_train_kyoto, nvmax = 6)
+summary(mod4)
+
+draw(summary(mod4), mod4)
+```
+
+```{r}
+subPred_kyoto = predict(mod4, newdata = df_test_kyoto, 3)
+resSub_kyoto = abs(subPred_kyoto - test_real_kyoto)
+accNum_kyoto = length(which(resSub_kyoto <= 3))
+accSub_kyoto = accNum_kyoto / len_kyoto; accSub_kyoto
+```
+
+**Subset Selection Accuracy on Testing set: 0.2**
+
+\newpage
+
+# liestal
+
+### Linear Regression
+
+```{r}
+df3 = read.csv("../../data/liestal/liestal_yearly.csv")
+df3 = df3[-2]
+set.seed(3)
+test_liestal = sample(c(1:26), 5, replace = F)
+df_test_liestal = df3[df3$X %in% test_liestal,]
+df_train_liestal = df3[!(df3$X %in% df_test_liestal$X),]
+df_test_liestal = df_test_liestal[-1]
+df_train_liestal = df_train_liestal[-1]
+```
+
+```{r warning=FALSE}
+mod5 = lm(bloom_doy ~ ., data = df_train_liestal)
+test_predicted_liestal = round(predict.lm(mod5, newdata = df_test_liestal))
+test_real_liestal = df_test_liestal["bloom_doy"]
+residual_liestal = abs(test_predicted_liestal - test_real_liestal)
+len_liestal = length(residual$bloom_doy)
+accNum_liestal = length(residual$bloom_doy[residual$bloom_doy <= 3] )
+accuracy_liestal = accNum_liestal / len_liestal; accuracy_liestal
+```
+
+**Linear Regression Accuracy on Testing set: 0.3333333**
+
+### Subset Selection
+
+```{r}
+mod6 = regsubsets(bloom_doy ~ ., data = df_train_liestal, nvmax = 6)
+summary(mod6)
+
+draw(summary(mod6), mod6)
+```
+
+```{r}
+subPred_liestal = predict(mod6, newdata = df_test_liestal, 3)
+resSub_liestal = abs(subPred_liestal - test_real_liestal)
+accNum_liestal = length(which(resSub_liestal <= 3))
+accSub_liestal = accNum_liestal / len_liestal; accSub_liestal
+```
+
+**Subset Selection Accuracy on Testing set: 0.1333333**

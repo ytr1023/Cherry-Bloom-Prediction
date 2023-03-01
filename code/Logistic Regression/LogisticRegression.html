@@ -9,11 +9,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Xixi" />
 
-<meta name="date" content="2023-02-23" />
+<meta name="date" content="2023-02-28" />
 
-<title>projectPresentation</title>
+<title>LogisticRegression</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,52 +349,71 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">projectPresentation</h1>
-<h4 class="author">Xixi</h4>
-<h4 class="date">2023-02-23</h4>
+<h1 class="title toc-ignore">LogisticRegression</h1>
+<h4 class="date">2023-02-28</h4>
 
 </div>
 
 
-<div id="final-paper" class="section level1">
-<h1>Final Paper</h1>
-<p>Many cities are known for their cherry blossom viewing sites, and
-every year, thousands of tourists visit those places to watch cherry
-blossoms. However, many tourists on social media complained that either
-they went to the viewing sites, but the cherry had not bloomed, or the
-cherry had already started to wither. Two of our team members had this
-experience themselves. Thus, knowing the cherry blossom dates is
-beneficial for the tourists to arrange their trips, helping them save
-money and time.</p>
-<p>In this paper, we explore the 6 predictors of daily average
-temperature, humidity, pressure, wind speed, daily precipitation, and
-modified accumulated temperature, utilizing <em>various models</em> to
-predict cherry blossom dates at Washington, D.C. (USA), Kyoto (Japan),
-Liestal-Weideli (Switzerland) and Vancouver, BC (Canada).</p>
+<div id="washington" class="section level1">
+<h1>Washington</h1>
+<pre class="r"><code>df1 = read.csv(&quot;../../data/washington/washington_clean_combined.csv&quot;)
+df1 = df1[-2]
+set.seed(432)
+test = sample(c(1:77), 15, replace = F)
+df_test = df1[df1$X %in% test,]
+df_train = df1[!(df1$X %in% df_test$X),]
+df_test = df_test[-1]
+df_train = df_train[-1]</code></pre>
+<pre class="r"><code>mod1 = glm(bloom_doy ~ ., data = df_train)
+test_predicted = round(predict.glm(mod1, newdata = df_test))
+test_real = df_test[&quot;bloom_doy&quot;]
+residual = abs(test_predicted - test_real)
+len = length(residual$bloom_doy)
+accNum = length(residual$bloom_doy[residual$bloom_doy &lt;= 3] )
+accuracy = accNum / len; accuracy</code></pre>
+<pre><code>## [1] 0.2666667</code></pre>
+<p><strong>The Accuracy of Logistic Regression is 0.4666667</strong></p>
 </div>
-<div id="data" class="section level1">
-<h1>Data</h1>
-<p>Instead of using the cherry blossom date, we use blossom day (from
-Jan 1 of each year) as our dependent variable. We also scraped weather
-data such as daily average temperature, humidity, pressure, wind speed,
-daily precipitation from <a href="https://weather.com/?Goto=Redirected">The Weather Channel</a>
-using JavaScript.</p>
-<p>‘date’: date.toString(), ‘average_temperature’: sumTemp/i,
-‘total_precipitation’: precip, ‘humidity_rh’: sumHumid/i, ‘pressure_in’:
-pressure/i, ‘wind_speed’: windSpd/i, ‘max_temp’: maxTemp</p>
-<p>create new variables</p>
+<div id="kyoto" class="section level1">
+<h1>Kyoto</h1>
+<pre class="r"><code>df2 = read.csv(&quot;../../data/kyoto/kyotodoy_yearly.csv&quot;)
+df2 = df2[-2]
+set.seed(432)
+test_kyoto = sample(c(1:26), 5, replace = F)
+df_test_kyoto = df2[df2$X %in% test_kyoto,]
+df_train_kyoto = df2[!(df2$X %in% df_test_kyoto$X),]
+df_test_kyoto = df_test_kyoto[-1]
+df_train_kyoto = df_train_kyoto[-1]</code></pre>
+<pre class="r"><code>mod2 = glm(bloom_doy ~ ., data = df_train_kyoto)
+test_predicted_kyoto = round(predict.glm(mod2, newdata = df_test_kyoto))
+test_real_kyoto = df_test_kyoto[&quot;bloom_doy&quot;]
+residual_kyoto = abs(test_predicted_kyoto - test_real_kyoto)
+len_kyoto = length(residual_kyoto$bloom_doy)
+accNum_kyoto = length(residual_kyoto$bloom_doy[residual_kyoto$bloom_doy &lt;= 3] )
+accuracy_kyoto = accNum_kyoto / len_kyoto; accuracy</code></pre>
+<pre><code>## [1] 0.2666667</code></pre>
+<p><strong>The Accuracy of Logistic Regression is 0.4666667</strong></p>
 </div>
-<div id="methodology" class="section level1">
-<h1>Methodology</h1>
-</div>
-<div id="results" class="section level1">
-<h1>Results</h1>
-</div>
-<div id="conclusion" class="section level1">
-<h1>Conclusion</h1>
-</div>
-<div id="references" class="section level1">
-<h1>References</h1>
+<div id="liestal" class="section level1">
+<h1>Liestal</h1>
+<pre class="r"><code>df3 = read.csv(&quot;../../data/liestal/liestal_yearly.csv&quot;)
+df3 = df3[-2]
+set.seed(432)
+test_liestal = sample(c(1:77), 15, replace = F)
+df_test_liestal = df3[df3$X %in% test_liestal,]
+df_train_liestal = df3[!(df3$X %in% df_test_liestal$X),]
+df_test_liestal = df_test_liestal[-1]
+df_train_liestal = df_train_liestal[-1]</code></pre>
+<pre class="r"><code>mod3 = glm(bloom_doy ~ ., data = df_train_liestal)
+test_predicted_liestal = round(predict.glm(mod3, newdata = df_test_liestal))
+test_real_liestal = df_test_liestal[&quot;bloom_doy&quot;]
+residual_liestal = abs(test_predicted_liestal - test_real_liestal)
+len_liestal = length(residual_liestal$bloom_doy)
+accNum_liestal = length(residual_liestal$bloom_doy[residual_liestal$bloom_doy &lt;= 3] )
+accuracy_liestal = accNum_liestal / len_liestal; accuracy</code></pre>
+<pre><code>## [1] 0.2666667</code></pre>
+<p><strong>The Accuracy of Logistic Regression is 0.2666667</strong></p>
 </div>
 
 

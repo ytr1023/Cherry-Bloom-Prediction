@@ -8,6 +8,8 @@ date: "2023-02-28"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Washington
+
 ```{r}
 df1 = read.csv("../../data/washington/washington_clean_combined.csv")
 df1 = df1[-2]
@@ -25,7 +27,58 @@ test_predicted = round(predict.glm(mod1, newdata = df_test))
 test_real = df_test["bloom_doy"]
 residual = abs(test_predicted - test_real)
 len = length(residual$bloom_doy)
-accNum = length(residual$bloom_doy[residual$bloom_doy <= 4] )
+accNum = length(residual$bloom_doy[residual$bloom_doy <= 3] )
 accuracy = accNum / len; accuracy
 ```
 
+**The Accuracy of Logistic Regression is 0.4666667**
+
+# Kyoto
+
+```{r}
+df2 = read.csv("../../data/kyoto/kyotodoy_yearly.csv")
+df2 = df2[-2]
+set.seed(432)
+test_kyoto = sample(c(1:26), 5, replace = F)
+df_test_kyoto = df2[df2$X %in% test_kyoto,]
+df_train_kyoto = df2[!(df2$X %in% df_test_kyoto$X),]
+df_test_kyoto = df_test_kyoto[-1]
+df_train_kyoto = df_train_kyoto[-1]
+```
+
+```{r}
+mod2 = glm(bloom_doy ~ ., data = df_train_kyoto)
+test_predicted_kyoto = round(predict.glm(mod2, newdata = df_test_kyoto))
+test_real_kyoto = df_test_kyoto["bloom_doy"]
+residual_kyoto = abs(test_predicted_kyoto - test_real_kyoto)
+len_kyoto = length(residual_kyoto$bloom_doy)
+accNum_kyoto = length(residual_kyoto$bloom_doy[residual_kyoto$bloom_doy <= 3] )
+accuracy_kyoto = accNum_kyoto / len_kyoto; accuracy
+```
+
+**The Accuracy of Logistic Regression is 0.4666667**
+
+# Liestal
+
+```{r, warning=FALSE}
+df3 = read.csv("../../data/liestal/liestal_yearly.csv")
+df3 = df3[-2]
+set.seed(432)
+test_liestal = sample(c(1:77), 15, replace = F)
+df_test_liestal = df3[df3$X %in% test_liestal,]
+df_train_liestal = df3[!(df3$X %in% df_test_liestal$X),]
+df_test_liestal = df_test_liestal[-1]
+df_train_liestal = df_train_liestal[-1]
+```
+
+```{r, warning=FALSE}
+mod3 = glm(bloom_doy ~ ., data = df_train_liestal)
+test_predicted_liestal = round(predict.glm(mod3, newdata = df_test_liestal))
+test_real_liestal = df_test_liestal["bloom_doy"]
+residual_liestal = abs(test_predicted_liestal - test_real_liestal)
+len_liestal = length(residual_liestal$bloom_doy)
+accNum_liestal = length(residual_liestal$bloom_doy[residual_liestal$bloom_doy <= 3] )
+accuracy_liestal = accNum_liestal / len_liestal; accuracy
+```
+
+**The Accuracy of Logistic Regression is 0.2666667**
