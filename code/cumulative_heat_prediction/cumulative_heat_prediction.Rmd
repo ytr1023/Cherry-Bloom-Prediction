@@ -1,0 +1,20 @@
+---
+title: "cumulative_heat_prediction"
+output: html_document
+date: "2023-03-01"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Predict Cherry Blossom Using Standard Cumulative Heat
+
+## Cumulative Heat Standard Accuracy Rate (3 days)
+
+```{r}
+cum.heat.std <- read.csv("../../data/cumulative_heat_standard.csv")
+
+
+```
+
