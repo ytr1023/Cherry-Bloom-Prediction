@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Washington
 
 ```{r}
-df1 = read.csv("../../data/washington/washington_clean_combined.csv")
+df1 = read.csv("../../data/washington/washington_yearly.csv")
 df1 = df1[-2]
 set.seed(432)
 test = sample(c(1:77), 15, replace = F)

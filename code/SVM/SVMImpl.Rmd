@@ -11,8 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(dplyr)
 library(lubridate)
-df1 = read.csv("../../data/washington_weather.csv")
-df2 = read.csv("../../data/washingtondc.csv")
+df1 = read.csv("../../data/washington/washington.csv")
+df2 = read.csv("../../data/washington/washingtondoy.csv")
 date_obj <- as.Date(as.character(df1$Date), "%Y%m%d")  # Convert to Date object
 df1$Date <- format(date_obj, "%Y-%m-%d")  # Convert to desired format
 df1 <- df1 %>%
@@ -134,7 +134,8 @@ for (i in 1:length(predictdataInFrame)){
     accurateNum = accurateNum + 1
   }
 }
-accuracy = accurateNum / length(predictdataInFrame); accuracy
+accuracy = accurateNum / length(predictdataInFrame)
 
 ```
 
+**The Accuracy for SVM is 0.4**
