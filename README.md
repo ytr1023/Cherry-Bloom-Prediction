@@ -1,10 +1,5 @@
 # Cherry-Bloom-Prediction
 
-
-## Group Member
-
-Jeff Zhuo, Tianrui Ye, Wei Shan, Xi Du, Yuewei Wang
-
 ## How to check out our data?
 
 Under ```Cherry-Bloom-Prediction/data```, there are five floders. 
